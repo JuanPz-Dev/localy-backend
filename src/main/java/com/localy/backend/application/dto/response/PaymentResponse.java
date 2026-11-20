@@ -8,9 +8,11 @@ import com.localy.backend.domain.enums.PaymentStatus;
 
 public record PaymentResponse(
     Long id,
+    Long reservationId,
     BigDecimal amount,
-    PaymentMethod paymentMethod,
     PaymentStatus paymentStatus,
+    PaymentMethod paymentMethod,
     String transactionId,
+    Instant createdAt,
     Instant paidAt
 ){}

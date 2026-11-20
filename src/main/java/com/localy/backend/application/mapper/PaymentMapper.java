@@ -19,5 +19,7 @@ public interface PaymentMapper {
     @Mapping(target = "scheduledReleaseAt",ignore = true)
     @Mapping(target = "releasedAt", ignore = true)
     Payment toDomain(PaymentRequest paymentRequest);
+
+    @Mapping(source = "reservation.id", target = "reservationId")
     PaymentResponse toResponse(Payment payment);
 }
