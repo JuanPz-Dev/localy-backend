@@ -30,9 +30,21 @@ public interface TourServiceMapper {
         @MappingTarget TourService tourService
     );
 
-    @Mapping(target = "averageRating", source = "guideProfile.averageRating")
-    @Mapping(target = "reviewCount", source = "guideProfile.reviewCount")
+    @Mapping(target = "guideId", source = "guideProfile.id")
+    @Mapping(target = "averageRating", ignore = true)
+    @Mapping(target = "reviewCount", ignore = true)
     @Mapping(target = "guideName", source = "guideProfile.user.name")
     @Mapping(target = "guideProfilePicture", source = "guideProfile.user.profilePhoto")
     TourServiceResponse toResponse(TourService tourService);
+
+    @Mapping(target = "guideId", source = "tourService.guideProfile.id")
+    @Mapping(target = "averageRating", source = "averageRating")
+    @Mapping(target = "reviewCount", source = "reviewCount")
+    @Mapping(target = "guideName", source = "tourService.guideProfile.user.name")
+    @Mapping(target = "guideProfilePicture", source = "tourService.guideProfile.user.profilePhoto")
+    TourServiceResponse toResponse(
+        TourService tourService,
+        Double averageRating,
+        Integer reviewCount
+    );
 }

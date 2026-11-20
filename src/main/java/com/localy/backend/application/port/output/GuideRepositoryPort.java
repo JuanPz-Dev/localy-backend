@@ -14,4 +14,5 @@ public interface GuideRepositoryPort {
     Optional<GuideProfile>findByUserId(Long id);
     PageResult<GuideProfile>findByGuideStatus(GuideStatus guideStatus, PaginationRequest pageRequest);
     void deleteById (Long id);
+    GuideProfile updateStatus (Long id, GuideStatus guideStatus);
 }

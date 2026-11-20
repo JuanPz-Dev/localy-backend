@@ -1,8 +1,12 @@
 package com.localy.backend.application.usecase.reservation;
 
+import java.util.Objects;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.localy.backend.application.dto.response.ReservationResponse;
+import com.localy.backend.application.exception.BusinessRuleException;
 import com.localy.backend.application.mapper.ReservationMapper;
 import com.localy.backend.application.port.input.reservation.CancelReservationUseCase;
 import com.localy.backend.application.port.output.ReservationRepositoryPort;
@@ -22,15 +26,17 @@ public class CancelReservationUseCaseImpl implements CancelReservationUseCase{
     private final ReservationRepositoryPort reservationPort;
 
     @Override
+    @Transactional
     public ReservationResponse execute(Long reservationId) {
-        User currenUser = currentUserPort.getCurrentUser();
+        User currentUser = currentUserPort.getCurrentUser();
         Reservation reservation = reservationPort.findById(reservationId)
-        .orElseThrow(()-> new RuntimeException("Reserva no encontrada"));
-        if (!reservation.getUser().getId().equals(currenUser.getId())) {
-            throw new RuntimeException("No puedes cancelar esta reserva");
+        .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada"));
+        if (reservation.getUser() == null
+                || !Objects.equals(reservation.getUser().getId(), currentUser.getId())) {
+            throw new BusinessRuleException("No puedes cancelar esta reserva");
         }
         if (reservation.getReservationStatus()!= ReservationStatus.PENDING) {
-            throw new RuntimeException("La reserva no puede ser cancelada");
+            throw new BusinessRuleException("La reserva no puede ser cancelada");
         }
         reservation.setReservationStatus(ReservationStatus.CANCELLED);
         Reservation savedReservation = reservationPort.save(reservation);

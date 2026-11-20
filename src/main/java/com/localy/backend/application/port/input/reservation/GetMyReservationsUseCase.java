@@ -5,5 +5,5 @@ import com.localy.backend.domain.common.PageResult;
 import com.localy.backend.domain.common.PaginationRequest;
 
 public interface GetMyReservationsUseCase {
-    PageResult<ReservationResponse> execute(PaginationRequest pageRequest);
+    PageResult<ReservationResponse> execute (PaginationRequest paginationRequest);
 }

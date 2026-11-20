@@ -13,7 +13,7 @@ import com.localy.backend.infrastructure.adapter.output.persistence.entity.TourS
                 LocationPersistenceMapper.class
             })
 public interface TourServicePersistenceMapper {
-    @Mapping(source = "guideProfile", target = "guideEntity")
+    @Mapping(target = "guideEntity", ignore = true)
     TourServiceEntity toEntity(TourService tourService);
     @Mapping(source = "guideEntity", target = "guideProfile")
     TourService toDomain(TourServiceEntity tourServiceEntity);

@@ -6,6 +6,7 @@ import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import com.localy.backend.application.port.output.UserRepositoryPort;
@@ -51,7 +52,11 @@ public class UserPersistenceAdapter implements UserRepositoryPort{
 
     @Override
     public PageResult<User> findByRole(Rol roles, PaginationRequest pageRequest) {
-        Pageable pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize());
+        Pageable pageable = PageRequest.of(
+            pageRequest.getPage(),
+            pageRequest.getSize(),
+            Sort.by(Sort.Direction.ASC, "id")
+        );
         Page<UserEntity> page = userJpaRepository.findByRolesIn(Set.of(roles), pageable);
         return new PageResult<>(
             page.getContent().stream().map(userPersistenceMapper::toDomain).toList(),

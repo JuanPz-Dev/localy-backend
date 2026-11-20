@@ -23,6 +23,8 @@ public class Reservation {
     private LocalDate reservationDate;
     private Integer adults;
     private Integer children;
+    private BigDecimal basePrice;
+    private BigDecimal commissionAmount;
     private BigDecimal totalPrice;
     private ReservationStatus reservationStatus;
     private Instant createdAt;

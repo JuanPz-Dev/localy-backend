@@ -1,6 +1,7 @@
 package com.localy.backend.application.usecase.admin;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.localy.backend.application.dto.response.UserResponse;
 import com.localy.backend.application.mapper.UserMapper;
@@ -21,6 +22,7 @@ public class FindUsersByRoleUseCaseImpl implements FindUsersByRoleUseCase{
     private final UserMapper userMapper;
     
     @Override
+    @Transactional(readOnly = true)
     public PageResult<UserResponse> execute(Rol rol, PaginationRequest paginationRequest) {
         PageResult<User> users = userRepositoryPort.findByRole(rol, paginationRequest);
         return new PageResult<>(

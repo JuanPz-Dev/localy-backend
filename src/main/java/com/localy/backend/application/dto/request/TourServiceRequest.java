@@ -11,7 +11,6 @@ public record TourServiceRequest(
     BigDecimal price,
     Integer minParticipants,
     Integer maxParticipants,
-    //List<String> photos,
     List<TourScheduleRequest> schedules,
     Integer durationMinutes,
     Category category,

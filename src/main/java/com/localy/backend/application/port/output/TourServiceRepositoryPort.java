@@ -1,5 +1,6 @@
 package com.localy.backend.application.port.output;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.localy.backend.domain.common.PageResult;
@@ -11,6 +12,7 @@ import com.localy.backend.domain.model.TourService;
 public interface TourServiceRepositoryPort {
     TourService save (TourService tourService);
     Optional<TourService>findById(Long id);
+    boolean isPhotoUsedByAnotherTour(String photoUrl, Long tourId);
     boolean existsById(Long id);
     PageResult<TourService>findAll(PaginationRequest pageRequest);
     PageResult<TourService>findByCategory(Category category,PaginationRequest pageRequest);
@@ -19,4 +21,6 @@ public interface TourServiceRepositoryPort {
     PageResult<TourService>findByStatus(ServiceStatus serviceStatus,PaginationRequest pageRequest);
     PageResult<TourService>findByTitle(String title,PaginationRequest pageRequest);
     void deleteById(Long id);
+
+    List<TourService> findAllForPrediction();
 }

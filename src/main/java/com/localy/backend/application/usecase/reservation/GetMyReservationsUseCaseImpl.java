@@ -3,6 +3,7 @@ package com.localy.backend.application.usecase.reservation;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.localy.backend.application.dto.response.ReservationResponse;
 import com.localy.backend.application.mapper.ReservationMapper;
@@ -18,26 +19,26 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class GetMyReservationsUseCaseImpl implements GetMyReservationsUseCase{
+public class GetMyReservationsUseCaseImpl implements GetMyReservationsUseCase {
 
-    private final CurrentUserPort currentUserPort;
+    private final CurrentUserPort currentUser;
     private final ReservationMapper reservationMapper;
     private final ReservationRepositoryPort reservationRepositoryPort;
 
     @Override
-    public PageResult<ReservationResponse> execute(PaginationRequest pageRequest) {
-        User user = currentUserPort.getCurrentUser();
-
-        PageResult<Reservation> reservations = reservationRepositoryPort.findByUserId(user.getId(), pageRequest);
+    @Transactional(readOnly = true)
+    public PageResult<ReservationResponse> execute(PaginationRequest paginationRequest) {
+        User user = currentUser.getCurrentUser();
+        PageResult<Reservation> reservations = reservationRepositoryPort.findByUserId(user.getId(), paginationRequest);
         List<ReservationResponse> responses = reservations.getContent()
-        .stream()
-        .map(reservationMapper::toResponse)
-        .toList();
+                .stream()
+                .map(reservationMapper::toResponse)
+                .toList();
         return new PageResult<>(
-            responses,
-            reservations.getPage(),
-            reservations.getSize(),
-            reservations.getTotalElements()
+                responses,
+                reservations.getPage(),
+                reservations.getSize(),
+                reservations.getTotalElements()
         );
     }
 }

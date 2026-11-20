@@ -13,6 +13,8 @@ public interface ReservationMapper {
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "tourService", ignore = true)
     @Mapping(target = "reservationStatus", ignore = true)
+    @Mapping(target = "basePrice", ignore = true)
+    @Mapping(target = "commissionAmount", ignore = true)
     @Mapping(target = "totalPrice", ignore = true)
     @Mapping(target = "tourSchedule", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
@@ -25,5 +27,6 @@ public interface ReservationMapper {
     @Mapping(target = "adults", source = "adults")
     @Mapping(target = "children", source = "children")
     @Mapping(target = "status", source = "reservationStatus")
+    @Mapping(target = "startTime", source = "tourSchedule.startTime")
     ReservationResponse toResponse(Reservation reservation);
 }

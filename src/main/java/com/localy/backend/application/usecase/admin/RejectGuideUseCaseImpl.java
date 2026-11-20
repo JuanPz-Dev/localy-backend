@@ -1,6 +1,7 @@
 package com.localy.backend.application.usecase.admin;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.localy.backend.application.dto.response.GuideProfileResponse;
 import com.localy.backend.application.mapper.GuideProfileMapper;
@@ -19,6 +20,7 @@ public class RejectGuideUseCaseImpl implements RejectGuideUseCase{
     private final GuideRepositoryPort guideRepositoryPort;
 
     @Override
+    @Transactional
     public GuideProfileResponse execute(Long guideId) {
         GuideProfile guide = guideRepositoryPort.findById(guideId)
         .orElseThrow(()-> new IllegalArgumentException("Solicitud de guía no encontrada"));
@@ -27,11 +29,7 @@ public class RejectGuideUseCaseImpl implements RejectGuideUseCase{
             throw new IllegalArgumentException("La solicitud de guía ya fue procesada");
         }
 
-        GuideProfile rejectedGuide = guide.toBuilder()
-        .guideStatus(GuideStatus.REJECTED)
-        .build();
-
-        GuideProfile saveGuide = guideRepositoryPort.save(rejectedGuide);
+        GuideProfile saveGuide = guideRepositoryPort.updateStatus(guideId, GuideStatus.REJECTED);
         return guideProfileMapper.toResponse(saveGuide);
     }
 }

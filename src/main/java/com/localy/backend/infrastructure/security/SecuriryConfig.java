@@ -21,7 +21,6 @@ import com.localy.backend.infrastructure.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-
 @Configuration
 public class SecuriryConfig {
 
@@ -48,15 +47,20 @@ public class SecuriryConfig {
                 "/login/oauth2/code/**"
             ).permitAll()
             //Consultar tour
+            .requestMatchers(HttpMethod.GET, "/guides/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/chat").permitAll()
             .requestMatchers(HttpMethod.GET, "/tours/**").permitAll()
-
+            .requestMatchers(HttpMethod.GET, "/reviews/tour/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/reviews/tour/**", "/payments/*").hasRole("USER")
             // -> Solo guide
             .requestMatchers(HttpMethod.POST, "/tours/**").hasRole("GUIDE")
             .requestMatchers(HttpMethod.PUT, "/tours/**").hasRole("GUIDE")
             .requestMatchers(HttpMethod.DELETE,"/tours/**").hasRole("GUIDE")
+            .requestMatchers(HttpMethod.GET,"/tours/**").hasRole("GUIDE")
 
+            .requestMatchers(HttpMethod.GET, "/reservations/guide").hasRole("GUIDE")
             .requestMatchers("/guides/apply" , "/reservations/**").hasRole("USER")
-            .requestMatchers("/admin/**").hasRole("ADMIN")
+            .requestMatchers("/admin/**" , "/api/predictions/**").hasRole("ADMIN")
             .anyRequest().authenticated()
         )
         .oauth2Login(oauth2 -> oauth2.successHandler(oAuth2SuccessHandler))
@@ -68,7 +72,7 @@ public class SecuriryConfig {
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
 

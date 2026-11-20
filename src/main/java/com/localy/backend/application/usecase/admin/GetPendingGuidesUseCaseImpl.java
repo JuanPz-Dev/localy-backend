@@ -4,6 +4,7 @@ package com.localy.backend.application.usecase.admin;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.localy.backend.application.dto.response.PendingGuideResponse;
 import com.localy.backend.application.mapper.GuideProfileMapper;
@@ -24,6 +25,7 @@ public class GetPendingGuidesUseCaseImpl implements GetPendingGuidesUseCase{
     private final GuideRepositoryPort guideRepositoryPort;
 
     @Override
+    @Transactional(readOnly = true)
     public PageResult<PendingGuideResponse> execute(PaginationRequest paginationRequest) {
         PageResult<GuideProfile> pendingGuides = guideRepositoryPort.findByGuideStatus(GuideStatus.PENDING, paginationRequest);
         List<PendingGuideResponse> responses = pendingGuides.getContent()

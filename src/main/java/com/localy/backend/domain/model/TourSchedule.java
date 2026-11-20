@@ -13,6 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 
 public class TourSchedule {
+    private Long id;
     private DayOfWeek day;
     private LocalTime startTime;
 }

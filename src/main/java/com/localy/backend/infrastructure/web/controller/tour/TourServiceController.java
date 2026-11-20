@@ -12,6 +12,7 @@ import com.localy.backend.application.dto.request.TourServiceRequest;
 import com.localy.backend.application.dto.response.TourServiceResponse;
 import com.localy.backend.application.port.input.tour.CreateTourServiceUseCase;
 import com.localy.backend.application.port.input.tour.DeleteTourServiceUseCase;
+import com.localy.backend.application.port.input.tour.GetMyTourServicesUseCase;
 import com.localy.backend.application.port.input.tour.GetTourServiceUseCase;
 import com.localy.backend.application.port.input.tour.SearchTourServicesUseCase;
 import com.localy.backend.application.port.input.tour.UpdateTourServiceUseCase;
@@ -22,6 +23,8 @@ import com.localy.backend.domain.enums.Category;
 import lombok.RequiredArgsConstructor;
 import tools.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -44,6 +47,7 @@ public class TourServiceController {
     private final UpdateTourServiceUseCase updateTourServiceUseCase;
     private final SearchTourServicesUseCase searchTourServicesUseCase;
     private final ObjectMapper objectMapper;
+    private final GetMyTourServicesUseCase getMyTourServicesUseCase;
 
     @PostMapping("/create")
     public ResponseEntity<TourServiceResponse> create(
@@ -51,18 +55,7 @@ public class TourServiceController {
         @RequestPart ("photos") List<MultipartFile>photos) throws Exception{
 
             TourServiceRequest tourServiceRequest = objectMapper.readValue(data, TourServiceRequest.class);
-            List<FileUpload> fileUploads = photos.stream()
-            .map(photo -> {
-                try {
-                   return new FileUpload(
-                    photo.getBytes(),
-                    photo.getOriginalFilename()
-                   ); 
-                } catch (Exception e) {
-                    throw new RuntimeException("Error al procesar la imagen", e);
-                }
-            }
-        ).toList();
+            List<FileUpload> fileUploads = toFileUploads(photos);
         TourServiceResponse tourServiceResponse = createTourServiceUseCase.execute(tourServiceRequest,fileUploads);
         return ResponseEntity.status(HttpStatus.CREATED).body(tourServiceResponse);
     }
@@ -84,9 +77,36 @@ public class TourServiceController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<TourServiceResponse>update(@PathVariable Long id, @RequestBody TourServiceRequest tourServiceRequest) {
-        TourServiceResponse tourServiceResponse = updateTourServiceUseCase.execute(id, tourServiceRequest);
+    public ResponseEntity<TourServiceResponse>update(
+        @PathVariable Long id,
+        @RequestPart("data") String data,
+        @RequestPart(value = "photos", required = false) List<MultipartFile> photos,
+        @RequestParam(value = "existingPhotos", required = false) List<String> existingPhotos
+    ) throws Exception {
+        TourServiceRequest tourServiceRequest = objectMapper.readValue(data, TourServiceRequest.class);
+        List<FileUpload> fileUploads = toFileUploads(photos);
+        TourServiceResponse tourServiceResponse = updateTourServiceUseCase.execute(
+                id,
+                tourServiceRequest,
+                fileUploads,
+                existingPhotos == null ? List.of() : existingPhotos
+        );
         return ResponseEntity.status(HttpStatus.OK).body(tourServiceResponse);
+    }
+
+    private List<FileUpload> toFileUploads(List<MultipartFile> photos) {
+        if (photos == null || photos.isEmpty()) {
+            return List.of();
+        }
+        List<FileUpload> fileUploads = new ArrayList<>(photos.size());
+        for (MultipartFile photo : photos) {
+            try {
+                fileUploads.add(new FileUpload(photo.getBytes(), photo.getOriginalFilename()));
+            } catch (IOException exception) {
+                throw new IllegalArgumentException("Error al procesar una fotografía", exception);
+            }
+        }
+        return fileUploads;
     }
 
     @DeleteMapping("/delete/{id}")
@@ -94,4 +114,13 @@ public class TourServiceController {
         deleteTourServiceUseCase.execute(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/my-tours")
+    public ResponseEntity<List<TourServiceResponse>> getMyTourServices(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size) {
+        List<TourServiceResponse> tourServices = getMyTourServicesUseCase.getMyTourServices(new PaginationRequest(page, size));
+        return ResponseEntity.ok(tourServices);
+    }
+
 }

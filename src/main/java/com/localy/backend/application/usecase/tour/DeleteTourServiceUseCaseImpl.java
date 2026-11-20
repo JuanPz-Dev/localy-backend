@@ -30,6 +30,10 @@ public class DeleteTourServiceUseCaseImpl implements DeleteTourServiceUseCase{
            if (!tour.getGuideProfile().getId().equals(guide.getId())) {
             throw new IllegalArgumentException("No tienes permisos para eliminar este tour");
         }
-        tourServicePort.deleteById(id);
+        if (tour.isDeleted()) {
+            throw new IllegalArgumentException("El tour ya fue eliminado");
+        }
+        tour.setDeleted(true);
+        tourServicePort.save(tour);
     }   
 }

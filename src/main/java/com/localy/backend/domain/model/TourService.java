@@ -26,6 +26,8 @@ public class TourService {
     private BigDecimal price;
     private Integer minParticipants;
     private Integer maxParticipants;
+    @Builder.Default
+    private boolean deleted = false;
     private List<String>photos;
     private List<TourSchedule>schedules;
     private Integer durationMinutes;

@@ -7,12 +7,14 @@ import org.springframework.stereotype.Service;
 import com.localy.backend.application.dto.request.FileUpload;
 import com.localy.backend.application.dto.request.TourServiceRequest;
 import com.localy.backend.application.dto.response.TourServiceResponse;
+import com.localy.backend.application.exception.BusinessRuleException;
 import com.localy.backend.application.mapper.TourServiceMapper;
 import com.localy.backend.application.port.input.tour.CreateTourServiceUseCase;
 import com.localy.backend.application.port.output.CloudinaryPort;
 import com.localy.backend.application.port.output.GuideRepositoryPort;
 import com.localy.backend.application.port.output.TourServiceRepositoryPort;
 import com.localy.backend.application.port.security.CurrentUserPort;
+import com.localy.backend.domain.enums.GuideStatus;
 import com.localy.backend.domain.enums.ServiceStatus;
 import com.localy.backend.domain.model.GuideProfile;
 import com.localy.backend.domain.model.TourService;
@@ -34,7 +36,10 @@ public class CreateTourServiceUseCaseImpl implements CreateTourServiceUseCase{
     public TourServiceResponse execute(TourServiceRequest tourServiceRequest,List<FileUpload>photos) {
         User currentUser = currentUserPort.getCurrentUser();
         GuideProfile guide = guideRepositoryPort.findByUserId(currentUser.getId())
-        .orElseThrow(() -> new IllegalArgumentException("El usuario no es un guia"));
+        .orElseThrow(() -> new BusinessRuleException("El usuario no tiene un perfil de guía"));
+        if (guide.getGuideStatus() != GuideStatus.CORFIRMED) {
+            throw new BusinessRuleException("El perfil de guía debe estar aprobado para crear tours");
+        }
 
         List<String>photoUrl = photos.stream()
         .map(photo -> {

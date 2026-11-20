@@ -7,6 +7,7 @@ import com.localy.backend.domain.enums.Category;
 import com.localy.backend.domain.enums.ServiceStatus;
 
 public record TourServiceResponse(
+    Long guideId,
     Long id,
     String title,
     String description,

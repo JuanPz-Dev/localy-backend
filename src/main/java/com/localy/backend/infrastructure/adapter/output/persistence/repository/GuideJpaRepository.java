@@ -1,5 +1,6 @@
 package com.localy.backend.infrastructure.adapter.output.persistence.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -13,4 +14,5 @@ public interface GuideJpaRepository extends JpaRepository<GuideEntity,Long>{
     boolean existsByLicense(String license);
     Optional<GuideEntity>findByUserId(Long id);
     Page<GuideEntity>findByGuideStatus(GuideStatus guideStatus,Pageable pageable);
+    List<GuideEntity>findByGuideStatusOrderByIdAsc(GuideStatus guideStatus);
 }
