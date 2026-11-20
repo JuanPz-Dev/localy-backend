@@ -4,5 +4,5 @@ import com.localy.backend.application.dto.request.ReviewRequest;
 import com.localy.backend.application.dto.response.ReviewResponse;
 
 public interface CreateReviewUseCase {
-    ReviewResponse execute(Long userId, Long tourId, ReviewRequest reviewRequest);
+    ReviewResponse execute(Long tourId, ReviewRequest reviewRequest);
 }
